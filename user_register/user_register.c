@@ -13,6 +13,6 @@ void user_register(){
 
     // check if user in the database
 
-    // if user and password is correct
+    // if user and password is correct --> put in database.txt
     
 }
