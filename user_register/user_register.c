@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "user_register_func.h"
 void user_register(){
     print("hello world!\n");
     // don't change the variables please
