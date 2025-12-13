@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "user_register/register.h"
-//hello
+
 int main(int argc, char *argv[])
 {
 	int login_choice = 0;
@@ -14,8 +14,20 @@ int main(int argc, char *argv[])
 	while (login_choice != 1 && login_choice != 2 && login_choice != 3) {
 		scanf("%d", &login_choice);
 		if (login_choice == 1) {
-			//user_service();
-			printf("placeholder\n");
+			char* username[50];
+			char* password[50];
+			printf("Please input your account name: ");
+			scanf("%s", username);
+			printf("and password: ");
+			scanf("%s", password);
+						
+			// check if account exists
+			if ("declare condition") {
+				// if account exists check if password is correct
+				if ("declare condition") {
+					user_service();
+				}
+			}
 			return 0;
 		}
 		else if (login_choice == 2) {
