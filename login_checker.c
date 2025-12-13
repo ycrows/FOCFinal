@@ -3,15 +3,17 @@
 int login_checker(char username[], char password[]){
     
     FILE *fp = fopen("database.txt", "r");
-    if (fp == NULL) {
-        printf("Failed to open file\n");
-        return 1;
-    }
 
     char line[256];
     char file_username[50];
     char file_password[50];
     int user_found = 0;
+
+    if (fgets(line, sizeof(line), fp) == NULL) {
+        printf("No user in this system, please register one.\n");
+        fclose(fp);
+        return 0;
+    }
 
     while (fgets(line, sizeof(line), fp)) { // iterate through every line
         // find the names in database by searching for name=
