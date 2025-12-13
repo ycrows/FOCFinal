@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
 			scanf("%s", password);
 						
 			// use login checker
-			if (login_checker(char username[], char password[]) == 1) {
-				user_service(); // run user service
+			if (login_checker(username, password) == 1) {
+				user_service(username); // run user service
 			}
 			return 0;
 		}
