@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
 	while (login_choice != 1 && login_choice != 2 && login_choice != 3) {
 		scanf("%d", &login_choice);
 		if (login_choice == 1) {
-			char* username[50];
-			char* password[50];
+			char username[50];
+			char password[50];
 			printf("Please input your account name: ");
 			scanf("%s", username);
 			printf("and password: ");
