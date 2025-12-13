@@ -21,12 +21,9 @@ int main(int argc, char *argv[])
 			printf("and password: ");
 			scanf("%s", password);
 						
-			// check if account exists
-			if ("declare condition") {
-				// if account exists check if password is correct
-				if ("declare condition") {
-					user_service();
-				}
+			// use login checker
+			if (login_checker(char username[], char password[]) == 1) {
+					user_service(); // run user service
 			}
 			return 0;
 		}
