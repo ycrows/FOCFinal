@@ -1,1 +1,1 @@
-void add_friend(char sender[], char reciever[]);
+void add_friend(char sender[], char receiver[]);
