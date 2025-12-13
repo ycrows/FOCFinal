@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 						
 			// use login checker
 			if (login_checker(char username[], char password[]) == 1) {
-					user_service(); // run user service
+				user_service(); // run user service
 			}
 			return 0;
 		}

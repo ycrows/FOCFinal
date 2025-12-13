@@ -1,5 +1,10 @@
 #include <stdio.h>
 void user_register(){
+  
+
+
+
+
 	int service_choice = 0;
   printf("==================== Main Service ====================\n");
   printf("1. Manage friends\n");
@@ -22,8 +27,7 @@ void user_register(){
 		}
 		else if (service_choice == 3)
 			// return to main.c
-      return 0;
-	  else
+      else
 			printf("Invalid choice! Please enter a number between 1 and 3.\n");
 	}
 }
