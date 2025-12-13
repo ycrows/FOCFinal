@@ -1,14 +1,9 @@
 #include <stdio.h>
 void user_register(){
-  
-
-
-
-
 	int service_choice = 0;
-  printf("==================== Main Service ====================\n");
-  printf("1. Manage friends\n");
-  printf("2. Manage messages\n");
+  	printf("==================== Main Service ====================\n");
+  	printf("1. Manage friends\n");
+  	printf("2. Manage messages\n");
 	printf("3. Back\n");
 	printf("===============================================\n");
 	printf("Choose an option (1-3): ");
