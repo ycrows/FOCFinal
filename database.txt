@@ -1,20 +1,29 @@
-[user=1]
 name=duncan
 password=password2
 friends=
 incoming_request=walter
 outgoing_request=
 
-[user=2]
 name=darren
 password=0000
 friends=walter
 incoming_request=
-outgoing_request=
+outgoing_request=charles
 
-[user=3]
 name=walter
 password=12343kk
 friends=darren
-incoming_request=
+incoming_request=isaac
 outgoing_request=duncan
+
+name=isaac
+password=helloworld
+friends=darren,duncan,charles
+incoming_request=
+outgoing_request=walter,charles
+
+name=charles
+password=test123
+friends=
+incoming_request=isaac,darren
+outgoing_request=
