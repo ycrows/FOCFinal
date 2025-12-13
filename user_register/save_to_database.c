@@ -8,5 +8,6 @@ fprintf(fp,"password=%s\n",password);
 fprintf(fp,"friends=\n");
 fprintf(fp,"incoming_request=\n");
 fprintf(fp,"outgoing_request=\n");
+fprintf(database, "\n");
 fclose(fp)
 }
