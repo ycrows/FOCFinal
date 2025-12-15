@@ -11,13 +11,13 @@ int add_friends(char sender_name[]){
     // check if user add self
     if (strcmp(sender_name, receiver_name) == 0) {
         printf("Warning! Cannot add yourself as a friend!\n");
-        return -1;
+        return 2;
     }
 
     // check if user add someone not in database
     if (check_if_user_exists(receiver_name) == 0) {
         printf("Warning! The target user does not exist! Add friend failed.\n");
-        return -2;
+        return 3;
     }
 
     // if user account exist then
@@ -62,12 +62,12 @@ int add_friends(char sender_name[]){
     if (has_sent == 1) {
         // if second time then --> output fail
         printf("Warning! Friend request already sent! Please wait for approval.\n");
-        return -3;
+        return 4;
     }
     if (other_sent == 1) {
         // if already in incoming --> output fail
         printf("Warning! The other party has sent you a friend request! Please agree first.\n");
-        return -4;
+        return 5;
     }
 
     // All checks passed, update database
