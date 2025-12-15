@@ -1,1 +1,1 @@
-void add_friends(char username[]);
+int add_friends(char username[]);
