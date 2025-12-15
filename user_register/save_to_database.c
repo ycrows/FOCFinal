@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 void save_to_database(char username[], char password[]) {
   File *database
   database=fopen("database.txt", "a")
