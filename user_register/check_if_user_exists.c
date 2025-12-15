@@ -1,36 +1,20 @@
 #include <stdio.h>
 #include<string.h>
 int check_if_user_exists(char username[]) {
-  //variables declaration
-  int c;
-  char name_in_list[50];
-  //file open & check
-  FILE *fp_database = fopen("../database.txt","r");
-  if(fp_database == NULL){
-    printf("Failed to open database.txt");
+  FILE *fp = fopen("../database.txt","r");
+  if(fp == NULL){
+    printf("Warning! file \"database.txt\" cannot be openned!\n");
     return 0;
-  };
-  //move the cursor to the 2+7n line
-  do{
-    c = fgetc(fp_database);
-    if (c == EOF) {
-      fclose(fp_database);
-      return 0;
-      }
-    fseek(fp_database, 5, SEEK_CUR);
-    if (fgets(name_in_list, sizeof(name_in_list), fp_database) == NULL) {
-      fclose(fp_database);
-      return 0;
-      }
-    name_in_list[strcspn(name_in_list, "\n")] = '\0';
-    if (strncmp(name_in_list, username, strlen(username)) == 0) {
-      fclose(fp_database);
+  }
+  char buf[1024];
+  char target[50];
+  sprintf(target,"name=%s",username);
+  while(fgets(buf, sizeof(buf), fp) != NULL){
+    if(strstr(buf, target) != NULL){
+      fclose(fp);
       return 1;
-      }
-    for(int i = 0; i<5; i++){
-      while((c = fgetc(fp_database)) != EOF && c != '\n');
     }
-    fseek(fp_database, -1, SEEK_CUR);
-  }while(1);
-  fclose(fp_database);
+  }
+  fclose(fp);
+  return 0;
 }
