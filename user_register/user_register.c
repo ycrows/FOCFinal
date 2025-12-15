@@ -3,7 +3,7 @@
 #include "user_register_func.h"
 
 void user_register(){
-    printf("hello world!\n");
+
     // don't change the variables please
     char user[50];
     char password[50];
