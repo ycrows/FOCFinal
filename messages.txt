@@ -1,24 +1,24 @@
 TO=duncan
 FROM=darren
-TIME=
+TIME=2025-11-21 10:54:31
 UNREAD=1
 CONTENT=hello world
 ---
 TO=charles
 FROM=darren
-TIME=
+TIME=2025-10-05 09:54:31
 UNREAD=0
 CONTENT=this is a string
 ---
 TO=duncan
 FROM=isaac
-TIME=
+TIME=2025-09-09 09:09:31
 UNREAD=0
 CONTENT=message123 123
 ---
 TO=duncan
 FROM=charles
-TIME=
+TIME=2025-01-15 21:54:31
 UNREAD=1
 CONTENT=message
 ---
