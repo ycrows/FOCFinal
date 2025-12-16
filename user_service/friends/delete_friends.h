@@ -1,0 +1,1 @@
+void delete_friends(char username[]);
