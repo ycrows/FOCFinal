@@ -22,7 +22,7 @@ void user_register(){
     scanf("%s", password_confirm);
 
     if(strcmp(password, password_confirm) != 0){
-        printf("Error: Passwords do not match!\n");
+        printf("Passwords do not match. Registration failed.\n");
         return; // 直接退出函数，不继续执行 exit function
     }
 
@@ -34,6 +34,6 @@ void user_register(){
 
     // if user and password is correct --> put in database.txt
     save_to_database(user, password);
-    printf("User registered successfully!\n");
+    printf("Registration successful! You can now login.\n");
 }
 

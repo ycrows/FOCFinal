@@ -8,15 +8,11 @@ int login_checker(char username[], char password[]){
     char file_username[50];
     char file_password[50];
     int user_found = 0;
-
-    // in the case there are no users registered yet
-    if (fgets(line, sizeof(line), fp) == NULL) {
-        printf("No user in this system, please register one.\n");
-        fclose(fp);
-        return 0;
-    }
+    int has_users = 0;
 
     while (fgets(line, sizeof(line), fp)) { // iterate through every line
+        has_users = 1;
+
         // find the names in database by searching for name=
         if (strncmp(line, "name=", 5) == 0) {
             sscanf(line, "name=%49s", file_username); // store the username
@@ -40,10 +36,16 @@ int login_checker(char username[], char password[]){
         }
     }
 
-    if (!user_found) {
-        printf("Warning! Account name not found.\n");
+    if (has_users == 0) {
+        printf("No user in this system, please register one.\n");
+        fclose(fp);
+        return 0;
     }
 
-    fclose(fp);
+    if (user_found == 0) {
+        printf("Warning! Account name not found.\n");
+        fclose(fp);
+        return 0;
+    }
     return 0;
 }
