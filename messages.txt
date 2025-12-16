@@ -1,0 +1,24 @@
+TO=duncan
+FROM=darren
+TIME=
+UNREAD=1
+CONTENT=hello world
+---
+TO=charles
+FROM=darren
+TIME=
+UNREAD=0
+CONTENT=this is a string
+---
+TO=duncan
+FROM=isaac
+TIME=
+UNREAD=0
+CONTENT=message123 123
+---
+TO=duncan
+FROM=charles
+TIME=
+UNREAD=1
+CONTENT=message
+---
