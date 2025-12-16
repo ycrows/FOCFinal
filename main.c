@@ -26,14 +26,14 @@ int main(int argc, char *argv[])
 			if (login_checker(username, password) == 1) {
 				user_service(username); // run user service
 			}
-			return 0;
 		}
 		else if (login_choice == 2) {
 			user_register();
+		}
+		else if (login_choice == 3) {
+			printf("Byebye!\n");
 			return 0;
 		}
-		else if (login_choice == 3)
-			return 0;
 	    else
 			printf("Invalid choice! Please enter a number between 1 and 3.\n");
 	}
