@@ -1,12 +1,12 @@
 name=duncan
 password=password2
-friends=
+friends=isaac
 incoming_request=walter
 outgoing_request=
 
 name=darren
 password=0000
-friends=walter
+friends=walter,isaac
 incoming_request=
 outgoing_request=charles
 
@@ -18,7 +18,7 @@ outgoing_request=duncan
 
 name=isaac
 password=helloworld
-friends=darren,duncan,charles
+friends=darren,duncan
 incoming_request=
 outgoing_request=walter,charles
 
