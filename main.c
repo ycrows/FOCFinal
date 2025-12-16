@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include "user_register/register.h"
+#include "user_register/user_register_func.h"
+#include "login_check.h"
 
 int main(int argc, char *argv[])
 {
