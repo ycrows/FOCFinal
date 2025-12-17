@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include "user_register/user_register_func.h"
 #include "login_check.h"
+#include "user_service/main_service.h"
 
-int main(int argc, char *argv[])
+int main()
 {
 	while (1) {
 		int login_choice = 0;
@@ -24,8 +25,7 @@ int main(int argc, char *argv[])
 						
 			// use login checker
 			if (login_checker(username, password) == 1) {
-				user_service(username); // run user service
-				printf("user_service\n");
+				main_service(username); 
 			}
 		}
 		else if (login_choice == 2) {
