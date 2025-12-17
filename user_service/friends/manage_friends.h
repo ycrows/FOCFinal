@@ -1,1 +1,0 @@
-void manage_friends(char username[]);

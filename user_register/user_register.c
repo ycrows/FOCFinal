@@ -28,7 +28,7 @@ void user_register(){
 
     // check if user in the database
     if(check_if_user_exists(user) == 1){
-        printf("Error: User already exists!\n");
+        printf("Account name already exists.\n");
         return;
     }
 
