@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-int accept_friends(char username[]){
+void accept_friends(char username[]){
     FILE *fp = fopen("database.txt", "r");
     if (fp == NULL) {
         printf("Failed to open file\n");
-        return 1;
+        return; 
     }
 
-    char username[50] = "charles";
     char line[256];
     int user_found = 0;
     char incoming_requests[10][50]; // max 10 requests, each max 50 chars
@@ -46,13 +46,14 @@ int accept_friends(char username[]){
 
     if (!user_found) {
         printf("User not found.\n");
-        return 0;
+        return;
     }
     fclose(fp);
-    printf("Pending friend requests for %s:\n", username);
     if (request_count == 0) {
-        printf("No incoming requests.\n");
+        printf("No pending friend requests for %s.\n", username);
+        return;
     } else {
+        printf("Pending friend requests for %s:\n", username);
         for (int i = 0; i < request_count; i++) {
             printf("%d. %s\n", i+1, incoming_requests[i]);
         }
@@ -62,9 +63,18 @@ int accept_friends(char username[]){
 
     printf("Enter indices (space separated), press Enter to finish: ");
     
-    do {
-        int friend_choice;
-        scanf("%d", &friend_choice);
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    char input[256];
+    int friend_choice;
+    fgets(input, sizeof(input), stdin);  // read the whole line
+    char *saveptr1;
+    char *tok = strtok_r(input, " ", &saveptr1);
+    
+    while (tok != NULL) {
+        friend_choice = atoi(tok);
+
         if (friend_choice == request_count+1) {
             FILE *fp_read = fopen("database.txt", "r");
             char file_lines[1000][256]; // max 1000 lines
@@ -104,6 +114,52 @@ int accept_friends(char username[]){
                     }
                 }
             }
+            
+            for (int k = 0; k < request_count; k++) {
+                char *sender_name = incoming_requests[k];
+                for (int i = 0; i < line_count; i++) {
+                    if (strncmp(file_lines[i], "name=", 5) == 0) {
+                        char check_name[50];
+                        sscanf(file_lines[i], "name=%49s", check_name);
+
+                        if (strcmp(check_name, sender_name) == 0) {
+                            
+                            // add user to sender's friend list
+                            int friend_idx = i + 2; 
+                            char *f_ptr = file_lines[friend_idx] + strlen("friends=");
+                            f_ptr[strcspn(f_ptr, "\n")] = '\0';
+                            if (strlen(f_ptr) > 0) strcat(f_ptr, ",");
+                            strcat(f_ptr, username); // Add YOU
+                            strcat(file_lines[friend_idx], "\n");
+
+                            // B. remove user from sender's outgoing_request
+                            int out_idx = i + 4;
+                            char *out_ptr = file_lines[out_idx] + strlen("outgoing_request=");
+                            out_ptr[strcspn(out_ptr, "\n")] = '\0';
+
+                            // Rebuild the outgoing list without your name
+                            char new_out[256] = "outgoing_request=";
+                            char *tok = strtok(out_ptr, ",");
+                            int first = 1;
+                            
+                            while (tok) {
+                                // If token is not user, keep it
+                                if (strcmp(tok, username) != 0) {
+                                    if (!first) strcat(new_out, ",");
+                                    strcat(new_out, tok);
+                                    first = 0;
+                                }
+                                tok = strtok(NULL, ",");
+                            }
+                            strcat(new_out, "\n");
+                            strcpy(file_lines[out_idx], new_out);
+                            
+                            break; // done with this sender, move to the next one
+                        }
+                    }
+                }
+            }
+
 
             // Step 4: Write back to file
             FILE *fp_write = fopen("database.txt", "w");
@@ -118,7 +174,7 @@ int accept_friends(char username[]){
         }
         else if (friend_choice == request_count+2) {
             // return to the menu
-            break;
+            return;
         }
         else if (1 <= friend_choice && friend_choice <= request_count) {
             // get the name from the array and based on friend_choice
@@ -173,6 +229,48 @@ int accept_friends(char username[]){
                 }
             }
 
+            for (int i = 0; i < line_count; i++) {
+                if (strncmp(file_lines[i], "name=", 5) == 0) {
+                    char file_username[50];
+                    sscanf(file_lines[i], "name=%49s", file_username);
+
+                    if (strcmp(file_username, incoming_requests[friend_choice-1]) == 0) {
+                        // 1. add username to friends
+                        i++; // password
+                        i++; // friends
+                        char *friends_ptr = file_lines[i] + strlen("friends=");
+                        friends_ptr[strcspn(friends_ptr, "\n")] = '\0';
+
+                        if (strlen(friends_ptr) > 0) strcat(friends_ptr, ",");
+                        strcat(friends_ptr, username);
+                        strcat(file_lines[i], "\n");
+
+                        // 2. remove username from outgoing_request
+                        i += 2; // incoming_request -> outgoing_request
+                        char *out_ptr = file_lines[i] + strlen("outgoing_request=");
+                        out_ptr[strcspn(out_ptr, "\n")] = '\0';
+
+                        char new_out[256] = "outgoing_request=";
+                        char *tok = strtok(out_ptr, ",");
+                        int first = 1;
+
+                        while (tok) {
+                            if (strcmp(tok, username) != 0) {
+                                if (!first) strcat(new_out, ",");
+                                strcat(new_out, tok);
+                                first = 0;
+                            }
+                            tok = strtok(NULL, ",");
+                        }
+
+                        strcat(new_out, "\n");
+                        strcpy(file_lines[i], new_out);
+                        break;
+                    }
+                }
+            }
+
+
             // Step 4: Write back to file
             FILE *fp_write = fopen("database.txt", "w");
             
@@ -182,9 +280,7 @@ int accept_friends(char username[]){
             fclose(fp_write);
 
             printf("Friend requests updated for %s.\n", incoming_requests[friend_choice-1]);
-            break;
         }
-    } while (1);
-    
-    return 0;
+        tok = strtok_r(NULL, " ", &saveptr1);
+    }
 }

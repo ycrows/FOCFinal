@@ -63,13 +63,14 @@ void delete_friends(char username[]){
 
     if (!user_found) {
         printf("User not found.\n");
-        return 0;
+        return;
     }
     fclose(fp);
-    printf("Your friends:\n");
     if (request_count == 0) {
         printf("You have no friends.\n");
+        return;
     } else {
+        printf("Your friends:\n");
         for (int i = 0; i < request_count; i++) {
             printf("%d. %s\n", i+1, delete_lists[i]);
         }
@@ -132,7 +133,7 @@ void delete_friends(char username[]){
         }
         else if (friend_choice == request_count+2) { 
             // return to the menu 
-            break; 
+            return;
         } 
         else if (1 <= friend_choice && friend_choice <= request_count) { 
             // get the name from the array and based on friend_choice 
@@ -187,5 +188,5 @@ void delete_friends(char username[]){
             break;
         }
     } while (1); 
-    return 0;
+    return;
 }

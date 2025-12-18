@@ -17,22 +17,22 @@ void manage_friends(char username[]) {
         if (friends_choice == 1) {
             // add friends
             add_friends(username);
-            break;
+            continue;
         }
         else if (friends_choice == 2) {
             // accept friends
-            //accept_friends(username);
-            break;
+            accept_friends(username);
+            continue;
         }
         else if (friends_choice == 3) {
             // delete friends
-            //delete_friends(username);
-            break;
+            delete_friends(username);
+            continue;
         }
         else if (friends_choice == 4) {
             // show current friends
-            //show_friends(username);
-            break;
+            show_friends(username);
+            continue;
         }
         else if (friends_choice == 5)
             // return to main.c
