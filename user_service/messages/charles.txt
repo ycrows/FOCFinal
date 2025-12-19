@@ -1,0 +1,5 @@
+FROM=darren
+TIME=2025-10-05 09:54:31
+UNREAD=0
+CONTENT=this is a string
+---
