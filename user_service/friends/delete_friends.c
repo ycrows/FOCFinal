@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void remove_name_from_friends(char *friends_line, const char *name) {
     char buffer[256] = "friends=";
@@ -80,9 +81,18 @@ void delete_friends(char username[]){
 
     printf("Enter friend numbers (separated by space), press Enter to finish: ");
     
-    do {
-        int friend_choice; 
-        scanf("%d", &friend_choice); 
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    char input[256];
+    int friend_choice;
+    fgets(input, sizeof(input), stdin);  // read the whole line
+    char *saveptr1;
+    char *tok = strtok_r(input, " ", &saveptr1);
+
+    while (tok != NULL) {
+        friend_choice = atoi(tok);
+        
         if (friend_choice == request_count+1) { 
             // remove all friends in user friend list
             // remove user from other friend list
@@ -184,9 +194,11 @@ void delete_friends(char username[]){
             }
             fclose(fp_write);
 
-            printf("%s has been removed from your friends list.\n", target);
-            break;
+            printf("Deleting %s...\n", target);
+            
         }
-    } while (1); 
+        tok = strtok_r(NULL, " ", &saveptr1);
+    } 
+    printf("Friend list updated.\n");
     return;
 }

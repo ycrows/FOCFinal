@@ -64,10 +64,10 @@ void show_friends(char username[]){
     }
 
     // Display friends (clean, user-friendly output)
-    printf("Your friends:\n");
     if (friend_count == 0) {
         printf("You have no friends.\n");
     } else {
+        printf("Your friends:\n");
         for (int i = 0; i < friend_count; i++) {
             printf("%d. %s\n", i + 1, friends[i]);
         }
