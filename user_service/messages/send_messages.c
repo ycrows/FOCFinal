@@ -147,8 +147,7 @@ int store_message(const Message *message) {
     if (!file_empty) {
         fprintf(fp, "\n");
     }
-
-    fprintf(fp, "TO=%s\n", message->to);
+    
     fprintf(fp, "FROM=%s\n", message->from);
     fprintf(fp, "TIME=%s\n", timestamp);
     fprintf(fp, "UNREAD=1\n");
