@@ -273,16 +273,3 @@ int send_messages(const char *sender) {
 
     return 0;
 }
-
-/*
-// --------------------------
-// Main Function (Example)
-// --------------------------
-int main() {
-    char username[MAX_NAME_LENGTH];
-    printf("Enter your username (to simulate login): ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = '\0'; "HAVE TO INCLUDE THIS"
-    send_messages(username);
-    return 0;
-}
