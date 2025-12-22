@@ -11,3 +11,4 @@ void save_to_database(char username[], char password[]);
 int check_if_user_exists(char username[]);
 
 #endif // USER_REGISTER
+

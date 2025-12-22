@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "friends_func.h"
 
 void remove_name_from_friends(char *friends_line, const char *name) {
     char buffer[256] = "friends=";
@@ -88,7 +89,7 @@ void delete_friends(char username[]){
     int friend_choice;
     fgets(input, sizeof(input), stdin);  // read the whole line
     char *saveptr1;
-    char *tok = strtok_r(input, " ", &saveptr1);
+    char *tok = my_strtok_r(input, " ", &saveptr1);
 
     while (tok != NULL) {
         friend_choice = atoi(tok);
@@ -197,8 +198,9 @@ void delete_friends(char username[]){
             printf("Deleting %s...\n", target);
             
         }
-        tok = strtok_r(NULL, " ", &saveptr1);
+        tok = my_strtok_r(NULL, " ", &saveptr1);
     } 
     printf("Friend list updated.\n");
     return;
 }
+

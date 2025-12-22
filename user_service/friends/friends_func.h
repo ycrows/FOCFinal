@@ -6,5 +6,6 @@ void add_friends(char sender_name[]);
 void delete_friends(char username[]);
 void manage_friends(char username[]);
 void show_friends(char username[]);
+char *my_strtok_r(char *str, const char *delim, char **saveptr);
 
 #endif 

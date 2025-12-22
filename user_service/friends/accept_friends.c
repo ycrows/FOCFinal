@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "friends_func.h"
 
 void accept_friends(char username[]){
     FILE *fp = fopen("database.txt", "r");
@@ -70,7 +71,7 @@ void accept_friends(char username[]){
     int friend_choice;
     fgets(input, sizeof(input), stdin);  // read the whole line
     char *saveptr1;
-    char *tok = strtok_r(input, " ", &saveptr1);
+    char *tok = my_strtok_r(input, " ", &saveptr1);
     
     while (tok != NULL) {
         friend_choice = atoi(tok);
@@ -281,6 +282,7 @@ void accept_friends(char username[]){
 
             printf("Friend requests updated for %s.\n", incoming_requests[friend_choice-1]);
         }
-        tok = strtok_r(NULL, " ", &saveptr1);
+        tok = my_strtok_r(NULL, " ", &saveptr1);
     }
 }
+
