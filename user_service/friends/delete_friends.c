@@ -63,7 +63,8 @@ void delete_friends(char username[]){
         }
     }
 
-    if (!user_found) {
+    // display output
+    if (user_found == 0) {
         printf("User not found.\n");
         return;
     }

@@ -45,7 +45,7 @@ void accept_friends(char username[]){
         }
     }
 
-    if (!user_found) {
+    if (user_found == 0) {
         printf("User not found.\n");
         return;
     }

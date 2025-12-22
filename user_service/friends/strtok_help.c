@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-char *my_strtok_r(char *str, const char *delim, char **saveptr)
+char *my_strtok_r(char *str, const char *stop, char **saveptr)
 {
     char *start;
 
@@ -11,13 +11,13 @@ char *my_strtok_r(char *str, const char *delim, char **saveptr)
         return NULL;
 
     start = *saveptr;
-    start += strspn(start, delim);
+    start += strspn(start, stop);
     if (*start == '\0') {
         *saveptr = NULL;
         return NULL;
     }
 
-    char *end = start + strcspn(start, delim);
+    char *end = start + strcspn(start, stop);
     if (*end)
         *end++ = '\0';
     *saveptr = end;
