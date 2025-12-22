@@ -177,7 +177,7 @@ void read_messages_menu() {
 
 
 // 主函数（入口）～_～
-int main() {
+void read_messages(char username[]) {
     read_messages_menu();
-    return 0;
+    return;
 }
