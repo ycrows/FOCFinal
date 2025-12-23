@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "friends/friends_func.h"
+#include "messages/messages_func.h"
 
 void main_service(char username[]){
 	int service_choice = 0;
@@ -12,13 +14,11 @@ void main_service(char username[]){
 		scanf("%d", &service_choice);
 		if (service_choice == 1) {
 			// manage friends
-			printf("Manage friends\n");
-			//manage_friends(username);
+			manage_friends(username);
 		}
 		else if (service_choice == 2) {
 			// manage messages
-			printf("Manage messages\n");
-			//manage_messages(username);
+			manage_messages(username);
 		}
 		else if (service_choice == 3)
 			break;

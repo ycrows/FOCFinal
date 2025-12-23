@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 //function prototype
 void convert_date(char *input_date, char *output_date);
 void get_msg_date(char *time_line, char *msg_date);
