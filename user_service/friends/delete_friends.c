@@ -28,43 +28,20 @@ void remove_name_from_friends(char *friends_line, const char *name) {
 
 void delete_friends(char username[]){
     FILE *fp = fopen("database.txt", "r");
-    
-    char line[256];
-    int user_found = 0;
-    char delete_lists[10][50]; // max 10 requests, each max 50 chars
-    int request_count = 0;
-
-    while (fgets(line, sizeof(line), fp)) {
-        // Check for "name=" line
-        if (strncmp(line, "name=", 5) == 0) {
-            char file_username[50];
-            sscanf(line, "name=%49s", file_username);
-
-            if (strcmp(file_username, username) == 0) {
-                user_found = 1;
-
-                // Skip next two lines (password and friends)
-                fgets(line, sizeof(line), fp); // password line
-
-                // Read delete_list line
-                fgets(line, sizeof(line), fp);
-                char *ptr = line + strlen("friends="); // move past the prefix
-                ptr[strcspn(ptr, "\n")] = '\0'; // remove newline
-
-                // Split by comma
-                char *token = strtok(ptr, ",");
-                while (token != NULL) {
-                    strcpy(delete_lists[request_count++], token);
-                    token = strtok(NULL, ",");
-                }
-
-                break;
-            }
-        }
+    if (fp == NULL) {
+        printf("Failed to open file\n");
+        return; 
     }
 
+    int user_found = 0;
+    char request_list[10][50]; // max 10 requests, each max 50 chars
+    int request_count = 0;
+    int mode = 2;
+    
+    request_builder(fp, username, request_list, &request_count, &user_found, mode);
+
     // display output
-    if (user_found == 0) {
+    if (!user_found) {
         printf("User not found.\n");
         return;
     }
@@ -75,7 +52,7 @@ void delete_friends(char username[]){
     } else {
         printf("Your friends:\n");
         for (int i = 0; i < request_count; i++) {
-            printf("%d. %s\n", i+1, delete_lists[i]);
+            printf("%d. %s\n", i+1, request_list[i]);
         }
         printf("%d. All\n", request_count+1);
         printf("%d. Back\n", request_count+2);
@@ -126,7 +103,7 @@ void delete_friends(char username[]){
                         char file_username[50];
                         sscanf(file_lines[i], "name=%49s", file_username);
 
-                        if (strcmp(file_username, delete_lists[f]) == 0) {
+                        if (strcmp(file_username, request_list[f]) == 0) {
                             i += 2; // friends line
                             remove_name_from_friends(file_lines[i], username);
                             break;
@@ -151,7 +128,7 @@ void delete_friends(char username[]){
             // get the name from the array and based on friend_choice 
             // remove the name from the friend_list and remove user name from other user friend list
             char target[50];
-            strcpy(target, delete_lists[friend_choice - 1]);
+            strcpy(target, request_list[friend_choice - 1]);
 
             FILE *fp_read = fopen("database.txt", "r");
             char file_lines[1000][256];
