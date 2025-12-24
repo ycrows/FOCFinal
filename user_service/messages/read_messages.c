@@ -83,27 +83,24 @@ void save_messages(Message messages[], int msg_count, const char *filename) {
             fprintf(fp, "---\n");
         }
     }
-
     fclose(fp);
-    printf("Messages saved successfully.\n");
 }
 
 /**
  * 打印所有消息（忽略未读状态）
  */
-void read_all(Message messages[], int msg_count) {
+void read_all(Message messages[], int msg_count, const char *filename) {
     if (msg_count == 0) {
-        printf("No messages found.\n");
+        printf("Found no messages.\n");
         return;
     }
 
-    printf("\n===== All Messages =====\n");
     // 遍历打印所有消息
     for (int i = 0; i < msg_count; i++) {
-        printf("[%s] From: %s %s\n", messages[i].time, messages[i].from, 
-               messages[i].unread ? "(Unread)" : "(Read)");
-        printf("Content: %s\n\n", messages[i].content);
+        printf("[%s] From: %s\n", messages[i].time, messages[i].from);
+        printf("%s\n", messages[i].content);
     }
+    save_messages(messages, msg_count, filename); // save the change
 }
 
 /**
@@ -118,13 +115,13 @@ void read_unread(Message messages[], int msg_count, const char *filename) {
         if (messages[i].unread == 1) {
             has_unread = 1;
             printf("[%s] From: %s\n", messages[i].time, messages[i].from);
-            printf("Content: %s\n\n", messages[i].content);
+            printf("%s\n\n", messages[i].content);
             messages[i].unread = 0; // 标记为已读
         }
     }
 
     if (!has_unread) {
-        printf("No unread messages.\n\n");
+        printf("Found no messages.\n\n");
     } else {
         save_messages(messages, msg_count, filename); // 保存修改后的状态
     }
@@ -150,7 +147,6 @@ void read_messages(const char *username) {
     int choice;
     do {
         // 打印功能菜单
-        printf("\n===== Message Menu for %s =====\n", username);
         printf("1. Read all messages\n");
         printf("2. Read unread messages only\n");
         printf("3. Back to main menu\n");
@@ -166,28 +162,15 @@ void read_messages(const char *username) {
         // 菜单功能分支
         switch (choice) {
             case 1:
-                read_all(messages, msg_count);
+                read_all(messages, msg_count, filename);
                 break; // 执行后回到菜单（原return改为break）
             case 2:
                 read_unread(messages, msg_count, filename);
                 break; // 执行后回到菜单（原return改为break）
             case 3:
-                printf("Returning to main menu...\n");
                 break;
             default:
                 printf("Invalid choice! Please enter 1-3.\n");
         }
     } while (choice != 3); // 选择3时退出循环
-}
-
-// 测试主函数（可根据实际业务逻辑替换）
-int main() {
-    // 示例：模拟传入用户名（实际使用时可从登录模块获取）
-    char username[50];
-    printf("Enter your username: ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = '\0'; // 去除换行符
-
-    read_messages(username);
-    return 0;
 }

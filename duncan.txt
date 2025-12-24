@@ -1,6 +1,6 @@
 FROM=darren
 TIME=2025-11-21 10:54:31
-UNREAD=1
+UNREAD=0
 CONTENT=hello world
 ---
 FROM=isaac
@@ -10,6 +10,5 @@ CONTENT=message123 123
 ---
 FROM=charles
 TIME=2025-01-15 21:54:31
-UNREAD=1
+UNREAD=0
 CONTENT=message
----
