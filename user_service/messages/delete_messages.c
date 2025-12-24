@@ -181,27 +181,7 @@ void delete_messages(char username[]) {
             has_from = has_time = 0;
         }
     }
-/*
-    if (strlen(msg_block) > 0) {
-        int need_delete = 0;
-        if (has_from && has_time) {
-            get_msg_sender(from_line, msg_sender);
-            get_msg_date(time_line, msg_date);
-            if (compare_date(start_date, msg_date) && compare_date(msg_date, end_date)) {
-                if (strcmp(target_sender, "all") == 0 || strcmp(target_sender, msg_sender) == 0) {
-                    need_delete = 1;
-                    delete_count++;
-                }
-            }
-        }
-        
-        // If it wasn't deleted, keep it
-        if (!need_delete && keep_count < 200) {
-             strncpy(keep_msgs[keep_count++], msg_block, sizeof(keep_msgs[0]) - 1);
-             keep_msgs[keep_count-1][sizeof(keep_msgs[0])-1] = '\0';
-        }
-    }
-*/
+
     fclose(fp_read);
 
     if (keep_count == 0 && delete_count == 0) {
