@@ -12,3 +12,4 @@ FROM=charles
 TIME=2025-01-15 21:54:31
 UNREAD=0
 CONTENT=message
+---
