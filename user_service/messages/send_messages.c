@@ -9,7 +9,7 @@
 #define MAX_FRIENDS 10
 #define MAX_NAME_LENGTH 50
 #define MAX_FIELD_LENGTH 256
-#define DATABASE_FILE "database.txt" // Remains in main folder
+#define DATABASE_FILE "database.txt" // Main folder
 #define MAX_SELECTIONS 10 // Max number of friends to select at once
 
 // --------------------------
@@ -64,17 +64,16 @@ int has_comma(const char *str) {
 }
 
 // --------------------------
-// Helper Function: Trim Leading/Trailing Spaces (No ctype.h — Manual Check)
+// Helper Function: Trim Leading/Trailing Spaces (Manual Check)
 // --------------------------
 void trim(char *str) {
     int start = 0, end = strlen(str) - 1;
-    // Skip leading spaces (manual check, no isspace())
+    // Skip leading spaces
     while (str[start] == ' ' && str[start] != '\0') start++;
-    // Skip trailing spaces (manual check, no isspace())
+    // Skip trailing spaces
     while (end >= start && str[end] == ' ') end--;
-    // Truncate string
+    // Truncate and move content
     str[end + 1] = '\0';
-    // Move content to start (if leading spaces were present)
     memmove(str, str + start, end - start + 2);
 }
 
@@ -143,12 +142,12 @@ int showCurrentFriends(const char *logged_in_username, char friends[MAX_FRIENDS]
 }
 
 // --------------------------
-// Function: Store Message to PER-RECIPIENT File (Preserves Original Format)
+// Function: Store Message to RECIPIENT-SPECIFIC FILES (MAIN FOLDER)
 // --------------------------
 int store_message(const Message *message) {
-    // Dynamically create filename: "messages/[recipient_name].txt"
-    char filename[MAX_FIELD_LENGTH + 20]; // Extra space for path + extension
-    snprintf(filename, sizeof(filename), "messages/%s.txt", message->to);
+    // Dynamically create filename: "[recipient_name].txt" (MAIN FOLDER, no subfolder)
+    char filename[MAX_FIELD_LENGTH + 10]; // Extra space for ".txt"
+    snprintf(filename, sizeof(filename), "%s.txt", message->to);
 
     // Open file in append mode (creates it if it doesn't exist)
     FILE *fp = fopen(filename, "a");
@@ -157,19 +156,18 @@ int store_message(const Message *message) {
         return -1;
     }
 
-    // Check if THIS recipient's file is empty
     int file_empty = is_file_empty(filename);
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     char timestamp[64];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
 
-    // Add newline before new message if file isn't empty (maintains format)
+    // Add newline before new message if file isn't empty
     if (!file_empty) {
         fprintf(fp, "\n");
     }
    
-    // Write message in original format
+    // Original format preserved
     fprintf(fp, "FROM=%s\n", message->from);
     fprintf(fp, "TIME=%s\n", timestamp);
     fprintf(fp, "UNREAD=1\n");
@@ -185,7 +183,7 @@ int store_message(const Message *message) {
 // --------------------------
 int send_messages(const char *sender) {
     // --------------------------
-    // STEP 1: Enter message FIRST (NO buffer flush)
+    // STEP 1: Enter message FIRST (no buffer flush)
     // --------------------------
     char content[MAX_FIELD_LENGTH];
     printf("Enter message (max 255 chars), press Enter to finish: ");
@@ -217,19 +215,17 @@ int send_messages(const char *sender) {
     printf("Enter friend numbers (separated by space), press Enter to finish: ");
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0';
-    trim(input); // Fixes extra spaces in selection (manual space check)
+    trim(input); // Fixes extra spaces
 
-    // Check for Back option (works with trimmed input)
+    // Check for Back option
     if (strlen(input) > 0 && atoi_custom(input) == back_option) {
         printf("Returning to previous menu...\n");
         return 0;
     }
 
-    // --------------------------
-    // KEY: Check for commas + show warning
-    // --------------------------
+    // Check for commas
     if (has_comma(input)) {
-        printf("WARNING: Commas are not allowed! Please use spaces only to separate selections.\n");
+        printf("WARNING: Commas are not allowed! Use spaces only.\n");
         printf("Aborting message send.\n");
         return -1;
     }
@@ -239,24 +235,22 @@ int send_messages(const char *sender) {
     strcpy(new_msg.content, content);
     int send_success = 1;
 
-    // Check for All option (works with trimmed input)
+    // Send to All
     if (strlen(input) > 0 && atoi_custom(input) == all_option) {
-        // Send to all friends
         for (int i = 0; i < friend_count; i++) {
             strcpy(new_msg.to, friends[i]);
             if (store_message(&new_msg) != 0) {
                 send_success = 0;
             }
         }
-        printf(send_success ? "Message sent to All\n" : "Message sent to most friends, but some failures occurred.\n");
+        printf(send_success ? "Message sent to All\n" : "Most sent, some failures.\n");
     }
-    // Case 2: Selected multiple/single friends (space-separated)
+    // Send to selected friends
     else {
         char *token = strtok(input, " ");
         int selections[MAX_SELECTIONS];
         int sel_count = 0;
 
-        // Parse all selections
         while (token != NULL && sel_count < MAX_SELECTIONS) {
             selections[sel_count] = atoi_custom(token);
             sel_count++;
@@ -272,11 +266,11 @@ int send_messages(const char *sender) {
             }
         }
         if (!valid) {
-            printf("Aborting message send.\n");
+            printf("Aborting send.\n");
             return -1;
         }
 
-        // Send to selected friends
+        // Send to selected
         for (int i = 0; i < sel_count; i++) {
             int friend_idx = selections[i] - 1;
             strcpy(new_msg.to, friends[friend_idx]);
@@ -288,6 +282,16 @@ int send_messages(const char *sender) {
             }
         }
      }
+
+    return 0;
+}
+
+// --------------------------
+// Example Main Function
+// --------------------------
+int main() {
+    // Example: Logged in as "Duncan" (replace with your login/menu logic)
+    send_messages("Duncan");
 
     return 0;
 }
