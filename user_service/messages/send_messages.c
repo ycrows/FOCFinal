@@ -9,8 +9,7 @@
 #define MAX_FRIENDS 10
 #define MAX_NAME_LENGTH 50
 #define MAX_FIELD_LENGTH 256
-#define MESSAGE_FILE "messages.txt"
-#define DATABASE_FILE "database.txt"
+#define DATABASE_FILE "database.txt" // Remains in main folder
 #define MAX_SELECTIONS 10 // Max number of friends to select at once
 
 // --------------------------
@@ -40,12 +39,12 @@ int atoi_custom(const char *str) {
 }
 
 // --------------------------
-// Helper Function: Check if file is empty
+// Helper Function: Check if File Is Empty (Simplified)
 // --------------------------
 int is_file_empty(const char *filename) {
     FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
-        return 1; // If file doesn't exist, treat it as empty
+        return 1; // Treat non-existent file as empty
     }
     int is_empty = (fgetc(fp) == EOF) ? 1 : 0;
     fclose(fp);
@@ -53,7 +52,7 @@ int is_file_empty(const char *filename) {
 }
 
 // --------------------------
-// Helper Function: Check if input contains any commas
+// Helper Function: Check if Input Contains Any Commas
 // --------------------------
 int has_comma(const char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
@@ -62,6 +61,21 @@ int has_comma(const char *str) {
         }
     }
     return 0; // No comma
+}
+
+// --------------------------
+// Helper Function: Trim Leading/Trailing Spaces (No ctype.h — Manual Check)
+// --------------------------
+void trim(char *str) {
+    int start = 0, end = strlen(str) - 1;
+    // Skip leading spaces (manual check, no isspace())
+    while (str[start] == ' ' && str[start] != '\0') start++;
+    // Skip trailing spaces (manual check, no isspace())
+    while (end >= start && str[end] == ' ') end--;
+    // Truncate string
+    str[end + 1] = '\0';
+    // Move content to start (if leading spaces were present)
+    memmove(str, str + start, end - start + 2);
 }
 
 // --------------------------
@@ -129,25 +143,33 @@ int showCurrentFriends(const char *logged_in_username, char friends[MAX_FRIENDS]
 }
 
 // --------------------------
-// Function: Store Message to File (NO leading newline)
+// Function: Store Message to PER-RECIPIENT File (Preserves Original Format)
 // --------------------------
 int store_message(const Message *message) {
-    FILE *fp = fopen(MESSAGE_FILE, "a");
+    // Dynamically create filename: "messages/[recipient_name].txt"
+    char filename[MAX_FIELD_LENGTH + 20]; // Extra space for path + extension
+    snprintf(filename, sizeof(filename), "messages/%s.txt", message->to);
+
+    // Open file in append mode (creates it if it doesn't exist)
+    FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
-        perror("Error opening messages file");
+        perror("Error opening recipient's message file");
         return -1;
     }
 
-    int file_empty = is_file_empty(MESSAGE_FILE);
+    // Check if THIS recipient's file is empty
+    int file_empty = is_file_empty(filename);
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     char timestamp[64];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", t);
 
+    // Add newline before new message if file isn't empty (maintains format)
     if (!file_empty) {
         fprintf(fp, "\n");
     }
-    
+   
+    // Write message in original format
     fprintf(fp, "FROM=%s\n", message->from);
     fprintf(fp, "TIME=%s\n", timestamp);
     fprintf(fp, "UNREAD=1\n");
@@ -163,7 +185,7 @@ int store_message(const Message *message) {
 // --------------------------
 int send_messages(const char *sender) {
     // --------------------------
-    // STEP 1: Enter message FIRST
+    // STEP 1: Enter message FIRST (NO buffer flush)
     // --------------------------
     char content[MAX_FIELD_LENGTH];
     printf("Enter message (max 255 chars), press Enter to finish: ");
@@ -192,12 +214,13 @@ int send_messages(const char *sender) {
     // STEP 3: Pick recipient option(s) - SPACE-ONLY
     // --------------------------
     char input[256];
-    printf("Enter friend numbers (seperated by space), press Enter to finish: ");
+    printf("Enter friend numbers (separated by space), press Enter to finish: ");
     fgets(input, sizeof(input), stdin);
     input[strcspn(input, "\n")] = '\0';
+    trim(input); // Fixes extra spaces in selection (manual space check)
 
-    // Check for Back option (exact input only)
-    if (strcmp(input, " ") != 0 && atoi_custom(input) == back_option && strlen(input) == 1) {
+    // Check for Back option (works with trimmed input)
+    if (strlen(input) > 0 && atoi_custom(input) == back_option) {
         printf("Returning to previous menu...\n");
         return 0;
     }
@@ -216,25 +239,20 @@ int send_messages(const char *sender) {
     strcpy(new_msg.content, content);
     int send_success = 1;
 
-    // Check for All option (exact input only)
-    if (strcmp(input, " ") != 0 && atoi_custom(input) == all_option && strlen(input) == 1) {
-        // Send to all
+    // Check for All option (works with trimmed input)
+    if (strlen(input) > 0 && atoi_custom(input) == all_option) {
+        // Send to all friends
         for (int i = 0; i < friend_count; i++) {
             strcpy(new_msg.to, friends[i]);
             if (store_message(&new_msg) != 0) {
                 send_success = 0;
             }
         }
-        // Feedback
-        if (send_success) {
-            printf("Message sent to All\n");
-        } else {
-            printf("Message sent to most friends, but some failures occurred.\n");
-        }
+        printf(send_success ? "Message sent to All\n" : "Message sent to most friends, but some failures occurred.\n");
     }
     // Case 2: Selected multiple/single friends (space-separated)
     else {
-        char *token = strtok(input, " "); // Split ONLY by spaces (no commas)
+        char *token = strtok(input, " ");
         int selections[MAX_SELECTIONS];
         int sel_count = 0;
 
@@ -258,7 +276,7 @@ int send_messages(const char *sender) {
             return -1;
         }
 
-        // Send to selected friends + correct name output
+        // Send to selected friends
         for (int i = 0; i < sel_count; i++) {
             int friend_idx = selections[i] - 1;
             strcpy(new_msg.to, friends[friend_idx]);
