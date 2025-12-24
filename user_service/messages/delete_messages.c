@@ -2,12 +2,24 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
+
 //function prototype
 void convert_date(char *input_date, char *output_date);
 void get_msg_date(char *time_line, char *msg_date);
 void get_msg_sender(char *from_line, char *sender);
 int compare_date(char *date1, char *date2);
 int has_messages(char *file_name);
+
+int is_valid_date_format(char *date) {
+    if (strlen(date) != 10) return 0;
+    if (date[2] != '/' || date[5] != '/') return 0;
+    for (int i = 0; i < 10; i++) {
+        if (i == 2 || i == 5) continue;
+        if (date[i] < '0' || date[i] > '9') return 0;
+    }
+    return 1;
+}
+
 //main function
 void delete_messages(char username[]) {
     char file_name[50];
@@ -22,15 +34,34 @@ void delete_messages(char username[]) {
     char start_date[11], end_date[11];
     printf("Enter start date (dd/mm/yyyy): ");
     scanf("%s", start_input);
+
+    if (!is_valid_date_format(start_input)) {
+        printf("Invalid start date format! Must be dd/mm/yyyy.\n");
+        return;
+    }
     printf("Enter end date (dd/mm/yyyy): ");
     scanf("%s", end_input);
+
+    if (!is_valid_date_format(end_input)) {
+        printf("Invalid end date format! Must be dd/mm/yyyy.\n");
+        return;
+    }
     printf("Enter account name (or 'all'): ");
     scanf("%s", target_sender);
 
     convert_date(start_input, start_date);
     convert_date(end_input, end_date);
 
+    if (!compare_date(start_date, end_date)) {
+        printf("Start date cannot be later than end date!\n");
+        return;
+    }
+
     FILE *fp_read = fopen(file_name, "r");
+    if (fp_read == NULL) {
+        printf("Failed to open file %s for reading.\n", file_name);
+        return;
+    }
     char keep_msgs[200][800];
     int keep_count = 0, delete_count = 0;
     char line[200], msg_block[800];
@@ -39,9 +70,19 @@ void delete_messages(char username[]) {
     int has_from = 0, has_time = 0;
 
     while (fgets(line, sizeof(line), fp_read)) {
-        strcat(msg_block, line);
-        if (strstr(line, "FROM=")) { strcpy(from_line, line); has_from = 1; }
-        if (strstr(line, "TIME=")) { strcpy(time_line, line); has_time = 1; }
+        if (strlen(msg_block) + strlen(line) < sizeof(msg_block) - 1) {
+            strcat(msg_block, line);
+        }
+        if (strstr(line, "FROM=")) { 
+            strncpy(from_line, line, sizeof(from_line) - 1);
+            from_line[sizeof(from_line)-1] = '\0';
+            has_from = 1; 
+        }
+        if (strstr(line, "TIME=")) { 
+            strncpy(time_line, line, sizeof(time_line) - 1);
+            time_line[sizeof(time_line)-1] = '\0';
+            has_time = 1; 
+        }
 
         if (strcmp(line, "---\n") == 0) {
             int need_delete = 0;
@@ -55,48 +96,91 @@ void delete_messages(char username[]) {
                     }
                 }
             }
-            if (!need_delete) strcpy(keep_msgs[keep_count++], msg_block);
+            if (!need_delete && keep_count < 200) {
+                strncpy(keep_msgs[keep_count++], msg_block, sizeof(keep_msgs[0]) - 1);
+                keep_msgs[keep_count-1][sizeof(keep_msgs[0])-1] = '\0';
+            }
             memset(msg_block, 0, sizeof(msg_block));
             has_from = has_time = 0;
         }
     }
     fclose(fp_read);
+
+    if (keep_count == 0 && delete_count == 0) {
+        printf("No messages matched the delete criteria, file remains unchanged.\n");
+        return;
+    }
+
     FILE *fp_write = fopen(file_name, "w");
-    for (int i = 0; i < keep_count; i++) fputs(keep_msgs[i], fp_write);
+    if (fp_write == NULL) {
+        printf("Failed to open file %s for writing.\n", file_name);
+        return;
+    }
+    for (int i = 0; i < keep_count; i++) {
+        fputs(keep_msgs[i], fp_write);
+    }
     fclose(fp_write);
-    printf("Removed %d message(s) from %s in period %s - %s.\n", delete_count, target_sender, start_input, end_input);
+
+    if (delete_count == 0) {
+        printf("No messages matched the criteria (sender: %s, period %s - %s), file not modified.\n", target_sender, start_input, end_input);
+    } else {
+        printf("Removed %d message(s) from %s in period %s - %s.\n", delete_count, target_sender, start_input, end_input);
+    }
 }
+
 //date form transformation
 void convert_date(char *input_date, char *output_date) {
     char day[3], month[3], year[5];
     strncpy(day, input_date, 2);
+    day[2] = '\0';
     strncpy(month, input_date + 3, 2);
+    month[2] = '\0';
     strncpy(year, input_date + 6, 4);
-    day[2] = month[2] = year[4] = '\0';
-    sprintf(output_date, "%s-%s-%s", year, month, day);
+    year[4] = '\0';
+    snprintf(output_date, 11, "%s-%s-%s", year, month, day);
 }
+
 //date reading
 void get_msg_date(char *time_line, char *msg_date) {
     strncpy(msg_date, time_line + 5, 10);
     msg_date[10] = '\0';
 }
+
 //sender reading
 void get_msg_sender(char *from_line, char *sender) {
     int i = 5, j = 0;
-    while (from_line[i] != '\n') sender[j++] = from_line[i++];
+    while (from_line[i] != '\n' && from_line[i] != '\r' && from_line[i] != '\0' && j < 19) {
+        sender[j++] = from_line[i++];
+    }
     sender[j] = '\0';
 }
+
 //date comparing
 int compare_date(char *date1, char *date2) {
     struct tm tm1 = {0}, tm2 = {0};
-    tm1.tm_year = atoi(date1) - 1900;
-    tm1.tm_mon = atoi(date1 + 5) - 1;
-    tm1.tm_mday = atoi(date1 + 8);
-    tm2.tm_year = atoi(date2) - 1900;
-    tm2.tm_mon = atoi(date2 + 5) - 1;
-    tm2.tm_mday = atoi(date2 + 8);
-    return mktime(&tm1) <= mktime(&tm2);
+    char year1[5], month1[3], day1[3];
+    char year2[5], month2[3], day2[3];
+    strncpy(year1, date1, 4); year1[4] = '\0';
+    strncpy(month1, date1 + 5, 2); month1[2] = '\0';
+    strncpy(day1, date1 + 8, 2); day1[2] = '\0';
+    strncpy(year2, date2, 4); year2[4] = '\0';
+    strncpy(month2, date2 + 5, 2); month2[2] = '\0';
+    strncpy(day2, date2 + 8, 2); day2[2] = '\0';
+
+    tm1.tm_year = atoi(year1) - 1900;
+    tm1.tm_mon = atoi(month1) - 1;
+    tm1.tm_mday = atoi(day1);
+    tm2.tm_year = atoi(year2) - 1900;
+    tm2.tm_mon = atoi(month2) - 1;
+    tm2.tm_mday = atoi(day2);
+    time_t t1 = mktime(&tm1);
+    time_t t2 = mktime(&tm2);
+    if (t1 == -1 || t2 == -1) {
+        return 0; 
+    }
+    return t1 <= t2;
 }
+
 //message nonempty justice
 int has_messages(char *file_name) {
     FILE *fp = fopen(file_name, "r");
@@ -104,7 +188,14 @@ int has_messages(char *file_name) {
     char line[200];
     int has_content = 0;
     while (fgets(line, sizeof(line), fp)) {
-        if (strlen(line) > 1) {
+        int is_blank = 1;
+        for (int i = 0; line[i] != '\0'; i++) {
+            if (line[i] != ' ' && line[i] != '\t' && line[i] != '\n' && line[i] != '\r') {
+                is_blank = 0;
+                break;
+            }
+        }
+        if (!is_blank) {
             has_content = 1;
             break;
         }
