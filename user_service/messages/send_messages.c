@@ -285,13 +285,3 @@ int send_messages(const char *sender) {
 
     return 0;
 }
-
-// --------------------------
-// Example Main Function
-// --------------------------
-int main() {
-    // Example: Logged in as "Duncan" (replace with your login/menu logic)
-    send_messages("Duncan");
-
-    return 0;
-}
