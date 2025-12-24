@@ -9,7 +9,7 @@
 #define MAX_FRIENDS 10
 #define MAX_NAME_LENGTH 50
 #define MAX_FIELD_LENGTH 256
-#define MESSAGE_FILE "messages/messages.txt"
+#define MESSAGE_FILE "messages.txt"
 #define DATABASE_FILE "database.txt"
 #define MAX_SELECTIONS 10 // Max number of friends to select at once
 
