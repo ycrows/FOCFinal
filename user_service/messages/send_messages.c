@@ -282,6 +282,4 @@ int send_messages(const char *sender) {
             }
         }
      }
-
-    return 0;
 }
