@@ -10,8 +10,6 @@
 #include <stdlib.h>
 
 // 宏定义：当前用户、消息文件、消息最大数量/长度
-#define CURRENT_USER "charles"
-#define MESSAGE_FILE CURRENT_USER ".txt"
 #define MAX_MESSAGES 100  // 最多存储100条消息
 #define MAX_LINE 200      // 每行内容最大长度
 
@@ -29,8 +27,8 @@ typedef struct {
  * @param messages 存储消息的数组
  * @return 消息的实际数量
  */
-int load_messages(Message messages[]) {
-    FILE *fp = fopen(MESSAGE_FILE, "r");
+int load_messages(Message messages[], const char *filename) {
+    FILE *fp = fopen(filename, "r");
     if (fp == NULL) {
         return 0; // 文件不存在/打开失败，返回0条消息
     }
@@ -70,8 +68,8 @@ int load_messages(Message messages[]) {
  * @param messages 消息数组
  * @param msg_count 消息数量
  */
-void save_messages(Message messages[], int msg_count) {
-    FILE *fp = fopen(MESSAGE_FILE, "w");
+void save_messages(Message messages[], int msg_count, const char *filename) {
+    FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
         perror("Failed to save messages");
         return;
@@ -96,7 +94,6 @@ void save_messages(Message messages[], int msg_count) {
  * 实现“read all”功能：打印所有消息（忽略UNREAD标签）
  */
 void read_all(Message messages[], int msg_count) {
-    printf("\n===== All Messages (TO: %s) =====\n", CURRENT_USER);
     if (msg_count == 0) {
         printf("No messages found.\n");
         return;
@@ -104,10 +101,8 @@ void read_all(Message messages[], int msg_count) {
 
     // 遍历打印所有消息
     for (int i = 0; i < msg_count; i++) {
-        printf("From: %s\n", messages[i].from);
-        printf("Time: %s\n", messages[i].time);
-        printf("Content: %s\n", messages[i].content);
-        printf("------------------------\n");
+        printf("[%s] From: %s\n", messages[i].time, messages[i].from);
+        printf("%s\n", messages[i].content);
     }
 }
 
@@ -115,69 +110,54 @@ void read_all(Message messages[], int msg_count) {
 /**
  * 实现“read unread”功能：打印未读消息，并标记为已读
  */
-void read_unread(Message messages[], int *msg_count) {
-    printf("\n===== Unread Messages (TO: %s) =====\n", CURRENT_USER);
+void read_unread(Message messages[], int *msg_count, const char *filename) {
     int has_unread = 0; // 标记是否有未读消息
 
     // 遍历打印未读消息，并修改UNREAD为0
     for (int i = 0; i < *msg_count; i++) {
         if (messages[i].unread == 1) {
             has_unread = 1;
-            printf("From: %s\n", messages[i].from);
-            printf("Time: %s\n", messages[i].time);
-            printf("Content: %s\n", messages[i].content);
-            printf("------------------------\n");
-            messages[i].unread = 0; // 标记为已读
+            printf("[%s] From: %s\n", messages[i].time, messages[i].from);
+            printf("%s\n", messages[i].content);
+            messages[i].unread = 0;
         }
     }
 
     if (!has_unread) {
         printf("No unread messages.\n");
     } else {
-        save_messages(messages, *msg_count); // 保存修改后的消息
-        printf("All unread messages marked as read.\n");
+        save_messages(messages, *msg_count, filename); // 保存修改后的消息
     }
 }
 
+// 主函数（入口）～_～
+void read_messages(const char *username) {
+    char filename[100];
+    snprintf(filename, sizeof(filename), "%s.txt", username);
 
-/**
- * read messages的交互式菜单
- */
-void read_messages_menu() {
     Message messages[MAX_MESSAGES];
-    int msg_count = load_messages(messages); // 加载消息
-    int choice;
+    int msg_count = load_messages(messages, filename);
 
+    int choice;
     do {
-        // 打印菜单
-        printf("\n===== Read Messages Menu =====\n");
-        printf("1. Read All Messages\n");
-        printf("2. Read Unread Messages\n");
+        printf("1. Read all messages\n");
+        printf("2. Read unread messages only\n");
         printf("3. Back\n");
         printf("Enter your choice (1-3): ");
         scanf("%d", &choice);
-        getchar(); // 吸收输入后的换行符
+        getchar();
 
-        // 处理用户选择
         switch (choice) {
             case 1:
                 read_all(messages, msg_count);
-                break;
+                return;
             case 2:
-                read_unread(messages, &msg_count);
-                break;
+                read_unread(messages, &msg_count, filename);
+                return;
             case 3:
-                printf("Returning to Manage Messages Menu...\n");
                 break;
             default:
                 printf("Invalid choice! Please enter 1-3.\n");
         }
-    } while (choice != 3); // 选择3则退出菜单
-}
-
-
-// 主函数（入口）～_～
-void read_messages(char username[]) {
-    read_messages_menu();
-    return;
+    } while (choice != 3);
 }
